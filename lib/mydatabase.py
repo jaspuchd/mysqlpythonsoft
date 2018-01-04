@@ -74,32 +74,33 @@ def insertRepoCommits(dbConfig, repoCommitsData, repoId):
         print("\nConnection with Database Successful for Repo Commits Table\n")
         myCursor = cnx.cursor()  # Cursor Creation
 
-        repoCommitsData[0]['repo_id'] = repoId
-        repoCommitsData[0]['comment_count'] = repoCommitsData[0]['commit']['comment_count']
-        repoCommitsData[0]['author_id'] = repoCommitsData[0]['author']['id']
-        repoCommitsData[0]['committer_id'] = repoCommitsData[0]['committer']['id']
-        repoCommitsData[0]['message'] = repoCommitsData[0]['commit']['message']
+        reqRepoCommitsData = []
 
-        ghAttribs = ['sha', 'repo_id', 'comment_count', 'author_id', 'committer_id', 'message']
+        for k in range(0, len(repoCommitsData)):
+            forEachCommitRecord = {}
+            forEachCommitRecord['sha'] = repoCommitsData[k]['sha']
+            forEachCommitRecord['repo_id'] = repoId
+            forEachCommitRecord['comment_count'] = repoCommitsData[k]['commit']['comment_count']
+            forEachCommitRecord['author_name'] = repoCommitsData[k]['commit']['author']['name']
+            forEachCommitRecord['author_email'] = repoCommitsData[k]['commit']['author']['email']
+            forEachCommitRecord['author_date'] = repoCommitsData[k]['commit']['author']['date']
+            forEachCommitRecord['committer_name'] = repoCommitsData[k]['commit']['committer']['name']
+            forEachCommitRecord['committer_email'] = repoCommitsData[k]['commit']['committer']['email']
+            forEachCommitRecord['committer_date'] = repoCommitsData[k]['commit']['committer']['date']
+            reqRepoCommitsData.append(forEachCommitRecord)
 
-        reqRepoCommitsData = {}
+        for k in range(0, len(reqRepoCommitsData)):
+            for l in reqRepoCommitsData[k]:
+                if reqRepoCommitsData[k][l] == '':
+                    reqRepoCommitsData[k] = None
 
-        for k in repoCommitsData[0]:
-            if k in ghAttribs:
-                reqRepoCommitsData[k] = repoCommitsData[0][k]
-
-        for k in reqRepoCommitsData:
-            if reqRepoCommitsData[k] == '':
-                reqRepoCommitsData[k] = None
-
-        for k, v in reqRepoCommitsData.items():
-            print('{}:{}'.format(k, v))
-
-        insertRepoCommitsQuery = """INSERT INTO commit (sha, repo_id, comment_count, author_id, committer_id, message)
+        insertRepoCommitsQuery = """INSERT INTO commit (sha, repo_id, comment_count, author_name, author_email, author_date, committer_name,committer_email,committer_date)
              VALUES
-             (%(sha)s, %(repo_id)s, %(comment_count)s, %(author_id)s, %(committer_id)s, %(message)s)"""
+             (%(sha)s, %(repo_id)s, %(comment_count)s, %(author_name)s,%(author_email)s,
+             STR_TO_DATE(%(author_date)s, "%Y-%m-%dT%TZ"), %(committer_name)s, %(committer_email)s,
+             STR_TO_DATE(%(committer_date)s, "%Y-%m-%dT%TZ"))"""
 
-        myCursor.execute(insertRepoCommitsQuery, reqRepoCommitsData)
+        myCursor.executemany(insertRepoCommitsQuery, reqRepoCommitsData)
         cnx.commit()
         myCursor.close()
 
