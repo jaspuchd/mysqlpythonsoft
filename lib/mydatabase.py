@@ -8,7 +8,13 @@ import sys
 def insertRepo(dbConfig, repoData):
 
     userData = myghdata.getUserInfo(repoData['owner']['login'])
-    insertUser(dbConfig, userData)
+
+    if userData is not None:
+        print("\nWe got User data from GitHub\n")
+        insertUser(dbConfig, userData)
+    else:
+        print("\nGitHub User Info API call returned None\n")
+        sys.exit(1)
 
     try:
         cnx = mysql.connector.connect(**dbConfig)  # Connection creation
@@ -16,13 +22,13 @@ def insertRepo(dbConfig, repoData):
         myCursor = cnx.cursor()  # Cursor Creation
         # keys for fetchting only required keys
 
-        ghAttribs = ['id', 'name', 'full_name', 'user_id', 'fork', 'created_at', 'updated_at', 'pushed_at', 'homepage', 'size', 'stargazers_count',
-                     'subscribers_count', 'forks', 'language', 'has_issues', 'has_pages', 'has_wiki', 'archived', 'open_issues', 'license', 'network_count']
-
         repoData['user_id'] = repoData['owner']['id']
 
         if repoData['license'] != None:
             repoData['license'] = repoData['license']['key']
+
+        ghAttribs = ['id', 'name', 'full_name', 'user_id', 'fork', 'created_at', 'updated_at', 'pushed_at', 'homepage', 'size', 'stargazers_count',
+                     'subscribers_count', 'forks', 'language', 'has_issues', 'has_pages', 'has_wiki', 'archived', 'open_issues', 'license', 'network_count']
 
         reqRepoData = {}
 
@@ -58,6 +64,66 @@ def insertRepo(dbConfig, repoData):
             print("Database {0} doesnt Exist".format(dbConfig['database']))
         else:
             print(err)
+    else:
+        cnx.close()
+
+    repoCommitsData = myghdata.getRepoCommitsInfo(repoData['full_name'])
+
+    if repoCommitsData is not None:
+        print("\nWe got Repository Commits data from GitHub\n")
+        insertRepoCommits(dbConfig, repoCommitsData, repoData['id'])
+    else:
+        print("\nGitHub Repo Commits Info API call returned None\n")
+        sys.exit(1)
+
+
+def insertRepoCommits(dbConfig, repoCommitsData, repoId):
+    try:
+        cnx = mysql.connector.connect(**dbConfig)  # Connection creation
+        print("\nConnection with Database Successful for Repo Commits Table\n")
+        myCursor = cnx.cursor()  # Cursor Creation
+
+        reqRepoCommitsData = []
+
+        for k in range(0, len(repoCommitsData)):
+            forEachCommitRecord = {}
+            forEachCommitRecord['sha'] = repoCommitsData[k]['sha']
+            forEachCommitRecord['repo_id'] = repoId
+            forEachCommitRecord['comment_count'] = repoCommitsData[k]['commit']['comment_count']
+            forEachCommitRecord['author_name'] = repoCommitsData[k]['commit']['author']['name']
+            forEachCommitRecord['author_email'] = repoCommitsData[k]['commit']['author']['email']
+            forEachCommitRecord['author_date'] = repoCommitsData[k]['commit']['author']['date']
+            forEachCommitRecord['committer_name'] = repoCommitsData[k]['commit']['committer']['name']
+            forEachCommitRecord['committer_email'] = repoCommitsData[k]['commit']['committer']['email']
+            forEachCommitRecord['committer_date'] = repoCommitsData[k]['commit']['committer']['date']
+            reqRepoCommitsData.append(forEachCommitRecord)
+
+        for k in range(0, len(reqRepoCommitsData)):
+            for l in reqRepoCommitsData[k]:
+                if reqRepoCommitsData[k][l] == '':
+                    reqRepoCommitsData[k] = None
+
+        insertRepoCommitsQuery = """INSERT INTO commit (sha, repo_id, comment_count, author_name, author_email, author_date, committer_name,committer_email,committer_date)
+             VALUES
+             (%(sha)s, %(repo_id)s, %(comment_count)s, %(author_name)s,%(author_email)s,
+             STR_TO_DATE(%(author_date)s, "%Y-%m-%dT%TZ"), %(committer_name)s, %(committer_email)s,
+             STR_TO_DATE(%(committer_date)s, "%Y-%m-%dT%TZ"))"""
+
+        myCursor.executemany(insertRepoCommitsQuery, reqRepoCommitsData)
+        cnx.commit()
+        myCursor.close()
+
+        print("\nData Inserted Successfully in Repo Commits Table\n")
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Wrong Username of Password for Database Connection")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database {0} doesnt Exist".format(dbConfig['database']))
+        else:
+            print(err)
+            sys.exit(1)  # If data doesnt got inserted in user table, system should
+            # stop here, without automatically inserting data in repo table.
     else:
         cnx.close()
 
