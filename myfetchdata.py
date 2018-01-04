@@ -45,7 +45,8 @@ def main():
             print('\nWe got Repository Data from GitHub\n')
             mydatabase.insertRepo(dbConfig, repoData)
         else:
-            print("Some error occured")
+            print("GitHub Repository Info API call returned None")
+            sys.exit(1)
     except Exception as e:
         print(e)
 

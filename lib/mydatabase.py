@@ -8,7 +8,13 @@ import sys
 def insertRepo(dbConfig, repoData):
 
     userData = myghdata.getUserInfo(repoData['owner']['login'])
-    insertUser(dbConfig, userData)
+
+    if userData is not None:
+        print("\nWe got User data from GitHub\n")
+        insertUser(dbConfig, userData)
+    else:
+        print("\nGitHub User Info API call returned None\n")
+        sys.exit(1)
 
     try:
         cnx = mysql.connector.connect(**dbConfig)  # Connection creation
@@ -62,7 +68,13 @@ def insertRepo(dbConfig, repoData):
         cnx.close()
 
     repoCommitsData = myghdata.getRepoCommitsInfo(repoData['full_name'])
-    insertRepoCommits(dbConfig, repoCommitsData, repoData['id'])
+
+    if repoCommitsData is not None:
+        print("\nWe got Repository Commits data from GitHub\n")
+        insertRepoCommits(dbConfig, repoCommitsData, repoData['id'])
+    else:
+        print("\nGitHub Repo Commits Info API call returned None\n")
+        sys.exit(1)
 
 
 def insertRepoCommits(dbConfig, repoCommitsData, repoId):

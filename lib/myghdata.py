@@ -31,6 +31,7 @@ def getRepoCommitsInfo(ghFullRepoName):
     url = '{0}repos/{1}/commits?per_page=100'.format(baseUrl, ghFullRepoName)
     r = requests.get(url, auth=(username, password), headers=headers)
     if r.status_code == 200:
+        print("\nStatus code is 200 for Repo Commits data\n")
         repoCommitsData = json.loads(r.text)
         print("Number of Commit Records Fetched: {}".format(len(repoCommitsData)))
         link = r.headers.get('link', None)
