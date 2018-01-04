@@ -30,20 +30,24 @@ def getRepoCommitsInfo(ghFullRepoName):
 
     url = '{0}repos/{1}/commits?per_page=100'.format(baseUrl, ghFullRepoName)
     r = requests.get(url, auth=(username, password), headers=headers)
-    repoCommitsData = json.loads(r.text)
-    print(len(repoCommitsData))
-    link = r.headers.get('link', None)
-    nextUrl = findNextUrl(link)
-    lastPageNo = findLastPageNo(link)
-
-    for i in range(2, lastPageNo + 1):
-        r = requests.get(nextUrl, auth=(username, password), headers=headers)
-        repoCommitsData.extend(json.loads(r.text))
-        print("Records Fetched: {}".format(len(repoCommitsData)))
+    if r.status_code == 200:
+        repoCommitsData = json.loads(r.text)
+        print("Number of Commit Records Fetched: {}".format(len(repoCommitsData)))
         link = r.headers.get('link', None)
-        nextUrl = findNextUrl(link)
+        if link is not None:
+            nextUrl = findNextUrl(link)
+            lastPageNo = findLastPageNo(link)
 
-    return repoCommitsData
+            for i in range(2, lastPageNo + 1):
+                r = requests.get(nextUrl, auth=(username, password), headers=headers)
+                repoCommitsData.extend(json.loads(r.text))
+                print("Number of Commit Records Fetched: {}".format(len(repoCommitsData)))
+                link = r.headers.get('link', None)
+                nextUrl = findNextUrl(link)
+
+        return repoCommitsData
+    else:
+        return None
 
 
 def getUserInfo(ghUserLogin):

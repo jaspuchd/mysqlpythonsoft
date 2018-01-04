@@ -66,9 +66,6 @@ def insertRepo(dbConfig, repoData):
 
 
 def insertRepoCommits(dbConfig, repoCommitsData, repoId):
-    print("\ndata reached in insert\n")
-    print("Repo id is {}\n".format(repoId))
-
     try:
         cnx = mysql.connector.connect(**dbConfig)  # Connection creation
         print("\nConnection with Database Successful for Repo Commits Table\n")
