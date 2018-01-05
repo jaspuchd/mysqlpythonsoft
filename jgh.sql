@@ -16,6 +16,63 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `commit`
+--
+
+DROP TABLE IF EXISTS `commit`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `commit` (
+  `sha` varchar(40) NOT NULL,
+  `repo_id` int(11) unsigned NOT NULL,
+  `comment_count` int(11) NOT NULL,
+  `author_name` varchar(50) DEFAULT NULL,
+  `author_email` varchar(80) DEFAULT NULL,
+  `author_date` datetime DEFAULT NULL,
+  `committer_name` varchar(50) DEFAULT NULL,
+  `committer_email` varchar(80) DEFAULT NULL,
+  `committer_date` datetime DEFAULT NULL,
+  PRIMARY KEY (`sha`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `commit`
+--
+
+LOCK TABLES `commit` WRITE;
+/*!40000 ALTER TABLE `commit` DISABLE KEYS */;
+/*!40000 ALTER TABLE `commit` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `contents`
+--
+
+DROP TABLE IF EXISTS `contents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `contents` (
+  `sha` varchar(40) NOT NULL,
+  `repo_id` int(11) unsigned NOT NULL,
+  `name` varchar(40) NOT NULL,
+  `path` varchar(100) NOT NULL,
+  `size` int(11) NOT NULL,
+  `type` varchar(10) NOT NULL,
+  PRIMARY KEY (`sha`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `contents`
+--
+
+LOCK TABLES `contents` WRITE;
+/*!40000 ALTER TABLE `contents` DISABLE KEYS */;
+/*!40000 ALTER TABLE `contents` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `repo`
 --
 
@@ -79,8 +136,8 @@ CREATE TABLE `user` (
   `public_gists` int(11) NOT NULL,
   `followers` int(11) NOT NULL,
   `following` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -103,4 +160,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-01 23:01:06
+-- Dump completed on 2018-01-05 16:10:43

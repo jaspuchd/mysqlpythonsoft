@@ -76,6 +76,62 @@ def insertRepo(dbConfig, repoData):
         print("\nGitHub Repo Commits Info API call returned None\n")
         sys.exit(1)
 
+    repoContentsData = myghdata.getRepoContentsInfo(repoData['full_name'])
+
+    if repoContentsData is not None:
+        print("\nWe got Repository Contents data from GitHub\n")
+        insertRepoContents(dbConfig, repoContentsData, repoData['id'])
+    else:
+        print("\nGitHub Repo Contents Info API call returned None\n")
+        sys.exit(1)
+
+
+def insertRepoContents(dbConfig, repoContentsData, repoId):
+    try:
+        cnx = mysql.connector.connect(**dbConfig)  # Connection creation
+        print("\nConnection with Database Successful for Repo Contents Table\n")
+        myCursor = cnx.cursor()  # Cursor Creation
+        # keys for fetchting only required keys
+
+        reqRepoContentsData = []
+
+        for k in range(0, len(repoContentsData)):
+            forEachContentRecord = {}
+            forEachContentRecord['sha'] = repoContentsData[k]['sha']
+            forEachContentRecord['repo_id'] = repoId
+            forEachContentRecord['name'] = repoContentsData[k]['name']
+            forEachContentRecord['path'] = repoContentsData[k]['path']
+            forEachContentRecord['size'] = repoContentsData[k]['size']
+            forEachContentRecord['type'] = repoContentsData[k]['type']
+            reqRepoContentsData.append(forEachContentRecord)
+
+        for k, v in reqRepoContentsData[0].items():
+            print("{}:{}".format(k, v))
+
+        for k in range(0, len(reqRepoContentsData)):
+            for l in reqRepoContentsData[k]:
+                if reqRepoContentsData[k][l] == '':
+                    reqRepoContentsData[k] = None
+
+        insertRepoContentsQuery = """INSERT INTO contents (sha, repo_id, name, path, size, type)
+             VALUES
+             (%(sha)s, %(repo_id)s, %(name)s, %(path)s,%(size)s, %(type)s)"""
+
+        myCursor.executemany(insertRepoContentsQuery, reqRepoContentsData)
+        cnx.commit()
+        myCursor.close()
+
+        print("\nData Inserted Successfully in Repo Contents Table\n")
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Wrong Username of Password for Database Connection")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database {0} doesnt Exist".format(dbConfig['database']))
+        else:
+            print(err)
+    else:
+        cnx.close()
+
 
 def insertRepoCommits(dbConfig, repoCommitsData, repoId):
     try:
