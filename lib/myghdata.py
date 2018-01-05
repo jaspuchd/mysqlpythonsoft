@@ -69,3 +69,13 @@ def getRepoInfo(ghFullRepoName):
         return json.loads(r.text)
     else:
         return None
+
+
+def getRepoContentsInfo(ghFullRepoName):
+    url = '{0}repos/{1}/contents'.format(baseUrl, ghFullRepoName)
+    r = requests.get(url, auth=(username, password), headers=headers)
+    if r.status_code == 200:
+        print("Status code is 200 for repo contents data")
+        return json.loads(r.text)
+    else:
+        return None
