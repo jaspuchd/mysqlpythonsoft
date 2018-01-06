@@ -85,6 +85,19 @@ def insertRepo(dbConfig, repoData):
         print("\nGitHub Repo Contents Info API call returned None\n")
         sys.exit(1)
 
+    # repoIssuesData = myghdata.getRepoIssuesInfo(repoData['full_name'])
+
+    # if repoIssuesData is not None:
+    #     print("\nWe got Repository Issues data from GitHub\n")
+    #     insertRepoIssues(dbConfig, repoIssuesData, repoData['id'])
+    # else:
+    #     print("\nGitHub Repo Issues Info API call returned None\n")
+    #     sys.exit(1)
+
+
+def insertRepoIssues(dbConfig, repoIssuesData, repoId):
+    pass
+
 
 def insertRepoContents(dbConfig, repoContentsData, repoId):
     try:

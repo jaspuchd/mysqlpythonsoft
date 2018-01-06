@@ -51,6 +51,31 @@ def getRepoCommitsInfo(ghFullRepoName):
         return None
 
 
+def getRepoIssuesInfo(ghFullRepoName):
+
+    url = '{0}repos/{1}/issues?state=all&per_page=100'.format(baseUrl, ghFullRepoName)
+    r = requests.get(url, auth=(username, password), headers=headers)
+    if r.status_code == 200:
+        print("\nStatus code is 200 for Repo Issues data\n")
+        repoIssuesData = json.loads(r.text)
+        print("Number of Issue Records Fetched: {}".format(len(repoIssuesData)))
+        link = r.headers.get('link', None)
+        if link is not None:
+            nextUrl = findNextUrl(link)
+            lastPageNo = findLastPageNo(link)
+
+            for i in range(2, lastPageNo + 1):
+                r = requests.get(nextUrl, auth=(username, password), headers=headers)
+                repoIssuesData.extend(json.loads(r.text))
+                print("Number of Issue Records Fetched: {}".format(len(repoIssuesData)))
+                link = r.headers.get('link', None)
+                nextUrl = findNextUrl(link)
+
+        return repoIssuesData
+    else:
+        return None
+
+
 def getUserInfo(ghUserLogin):
     url = '{0}users/{1}'.format(baseUrl, ghUserLogin)
     r = requests.get(url, auth=(username, password), headers=headers)
