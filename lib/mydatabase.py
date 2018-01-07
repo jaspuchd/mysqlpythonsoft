@@ -118,9 +118,6 @@ def insertRepoContents(dbConfig, repoContentsData, repoId):
             forEachContentRecord['type'] = repoContentsData[k]['type']
             reqRepoContentsData.append(forEachContentRecord)
 
-        for k, v in reqRepoContentsData[0].items():
-            print("{}:{}".format(k, v))
-
         for k in range(0, len(reqRepoContentsData)):
             for l in reqRepoContentsData[k]:
                 if reqRepoContentsData[k][l] == '':
