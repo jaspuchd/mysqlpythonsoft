@@ -9,23 +9,6 @@ headers = {'Content-Type': 'application/json',
            'Accept': 'application/vnd.github.v3+json'}
 
 
-def findLastPageNo(link):
-    lastPageNo = link.split(',')[1]
-    lastPageNo = re.findall(r'<(.*?)>', lastPageNo)[0]
-    lastPageNo = lastPageNo.split('?')[1]
-    if '&' in lastPageNo:
-        lastPageNo = lastPageNo.split('=')[2]
-    else:
-        lastPageNo = lastPageNo.split('=')[1]
-    return int(lastPageNo)
-
-
-def findNextUrl(link):
-    nextUrl = link.split(',')[0]
-    nextUrl = re.findall(r'<(.*?)>', nextUrl)[0]
-    return nextUrl
-
-
 def getRepoCommitsInfo(ghFullRepoName):
 
     url = '{0}repos/{1}/commits?per_page=100'.format(baseUrl, ghFullRepoName)
@@ -36,15 +19,13 @@ def getRepoCommitsInfo(ghFullRepoName):
         print("Number of Commit Records Fetched: {}".format(len(repoCommitsData)))
         link = r.headers.get('link', None)
         if link is not None:
-            nextUrl = findNextUrl(link)
-            lastPageNo = findLastPageNo(link)
+            lastPageNo = int(r.links['last']['url'].split('=')[-1])
 
             for i in range(2, lastPageNo + 1):
+                nextUrl = r.links['next']['url']
                 r = requests.get(nextUrl, auth=(username, password), headers=headers)
                 repoCommitsData.extend(json.loads(r.text))
                 print("Number of Commit Records Fetched: {}".format(len(repoCommitsData)))
-                link = r.headers.get('link', None)
-                nextUrl = findNextUrl(link)
 
         return repoCommitsData
     else:
@@ -61,15 +42,13 @@ def getRepoIssuesInfo(ghFullRepoName):
         print("Number of Issue Records Fetched: {}".format(len(repoIssuesData)))
         link = r.headers.get('link', None)
         if link is not None:
-            nextUrl = findNextUrl(link)
-            lastPageNo = findLastPageNo(link)
+            lastPageNo = int(r.links['last']['url'].split('=')[-1])
 
             for i in range(2, lastPageNo + 1):
+                nextUrl = r.links['next']['url']
                 r = requests.get(nextUrl, auth=(username, password), headers=headers)
                 repoIssuesData.extend(json.loads(r.text))
                 print("Number of Issue Records Fetched: {}".format(len(repoIssuesData)))
-                link = r.headers.get('link', None)
-                nextUrl = findNextUrl(link)
 
         return repoIssuesData
     else:
