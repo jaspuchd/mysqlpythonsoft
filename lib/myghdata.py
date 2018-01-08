@@ -11,8 +11,9 @@ headers = {'Content-Type': 'application/json',
 
 def getRepoCommitsInfo(ghFullRepoName):
 
-    url = '{0}repos/{1}/commits?per_page=100'.format(baseUrl, ghFullRepoName)
-    r = requests.get(url, auth=(username, password), headers=headers)
+    url = '{0}repos/{1}/commits'.format(baseUrl, ghFullRepoName)
+    payload = {'per_page': 100}
+    r = requests.get(url, auth=(username, password), headers=headers, params=payload)
     if r.status_code == 200:
         print("\nStatus code is 200 for Repo Commits data\n")
         repoCommitsData = json.loads(r.text)
@@ -34,8 +35,9 @@ def getRepoCommitsInfo(ghFullRepoName):
 
 def getRepoIssuesInfo(ghFullRepoName):
 
-    url = '{0}repos/{1}/issues?state=all&per_page=100'.format(baseUrl, ghFullRepoName)
-    r = requests.get(url, auth=(username, password), headers=headers)
+    url = '{0}repos/{1}/issues'.format(baseUrl, ghFullRepoName)
+    payload = {'state': 'all', 'per_page': 100}
+    r = requests.get(url, auth=(username, password), headers=headers, params=payload)
     if r.status_code == 200:
         print("\nStatus code is 200 for Repo Issues data\n")
         repoIssuesData = json.loads(r.text)
