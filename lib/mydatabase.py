@@ -23,35 +23,49 @@ def insertRepo(dbConfig, repoData):
         myCursor = cnx.cursor()  # Cursor Creation
         # keys for fetchting only required keys
 
-        repoData['user_id'] = repoData['owner']['id']
-
-        if repoData['license'] != None:
-            repoData['license'] = repoData['license']['key']
-
-        ghAttribs = ['id', 'name', 'full_name', 'user_id', 'fork', 'created_at', 'updated_at', 'pushed_at', 'homepage', 'size', 'stargazers_count',
-                     'subscribers_count', 'forks', 'language', 'has_issues', 'has_pages', 'has_wiki', 'archived', 'open_issues', 'license', 'network_count']
-
         reqRepoData = {}
-
-        for k in repoData:
-            if k in ghAttribs:
-                reqRepoData[k] = repoData[k]
+        reqRepoData['id'] = repoData['id']
+        reqRepoData['name'] = repoData['name']
+        reqRepoData['full_name'] = repoData['full_name']
+        reqRepoData['user_id'] = repoData['owner']['id']
+        reqRepoData['is_fork'] = repoData['fork']
+        reqRepoData['created_at'] = datetime.datetime.strptime(repoData['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+        reqRepoData['updated_at'] = datetime.datetime.strptime(repoData['updated_at'], "%Y-%m-%dT%H:%M:%SZ")
+        reqRepoData['pushed_at'] = datetime.datetime.strptime(repoData['pushed_at'], "%Y-%m-%dT%H:%M:%SZ")
+        reqRepoData['homepage'] = repoData['homepage']
+        reqRepoData['size'] = repoData['size']
+        reqRepoData['stargazers_count'] = repoData['stargazers_count']
+        reqRepoData['watchers_count'] = repoData['subscribers_count']
+        reqRepoData['forks'] = repoData['forks']
+        reqRepoData['primary_language'] = repoData['language']
+        reqRepoData['has_issues'] = repoData['has_issues']
+        reqRepoData['has_pages'] = repoData['has_pages']
+        reqRepoData['has_wiki'] = repoData['has_wiki']
+        reqRepoData['is_archived'] = repoData['archived']
+        reqRepoData['open_issues'] = repoData['open_issues']
+        reqRepoData['license'] = repoData['license']['key'] if repoData['license'] else None
+        reqRepoData['network_count'] = repoData['network_count']
+        reqRepoData['parent_repo_id'] = repoData['parent']['id'] if 'parent' in repoData else None
+        reqRepoData['parent_repo_full_name'] = repoData['parent']['full_name'] if 'parent' in repoData else None
+        reqRepoData['parent_repo_owner_id'] = repoData['parent']['owner']['id'] if 'parent' in repoData else None
+        reqRepoData['source_repo_id'] = repoData['source']['id'] if 'source' in repoData else None
+        reqRepoData['source_repo_full_name'] = repoData['source']['full_name'] if 'source' in repoData else None
+        reqRepoData['source_repo_owner_id'] = repoData['source']['owner']['id'] if 'source' in repoData else None
 
         for k in reqRepoData:
             if reqRepoData[k] == '':
                 reqRepoData[k] = None
 
-        reqRepoData['created_at'] = datetime.datetime.strptime(reqRepoData['created_at'], "%Y-%m-%dT%H:%M:%SZ")
-        reqRepoData['updated_at'] = datetime.datetime.strptime(reqRepoData['updated_at'], "%Y-%m-%dT%H:%M:%SZ")
-        reqRepoData['pushed_at'] = datetime.datetime.strptime(reqRepoData['pushed_at'], "%Y-%m-%dT%H:%M:%SZ")
-
         insertRepoQuery = """INSERT INTO repo (id, name, full_name, user_id, is_fork, created_at,updated_at,
         pushed_at, homepage, size, stargazers_count, watchers_count, forks, primary_language, has_issues,
-        has_pages, has_wiki, is_archived, open_issues, license, network_count)
+        has_pages, has_wiki, is_archived, open_issues, license, network_count, parent_repo_id, parent_repo_full_name,
+        parent_repo_owner_id, source_repo_id, source_repo_full_name, source_repo_owner_id)
         VALUES
-        (%(id)s,%(name)s,%(full_name)s,%(user_id)s,%(fork)s,%(created_at)s, %(updated_at)s,%(pushed_at)s,
-        %(homepage)s,%(size)s,%(stargazers_count)s,%(subscribers_count)s,%(forks)s,%(language)s,%(has_issues)s,
-        %(has_pages)s,%(has_wiki)s,%(archived)s,%(open_issues)s, %(license)s, %(network_count)s)"""
+        (%(id)s,%(name)s,%(full_name)s,%(user_id)s,%(is_fork)s,%(created_at)s, %(updated_at)s,%(pushed_at)s,
+        %(homepage)s,%(size)s,%(stargazers_count)s,%(watchers_count)s,%(forks)s,%(primary_language)s,%(has_issues)s,
+        %(has_pages)s,%(has_wiki)s,%(is_archived)s,%(open_issues)s, %(license)s, %(network_count)s, %(parent_repo_id)s,
+        %(parent_repo_full_name)s, %(parent_repo_owner_id)s, %(source_repo_id)s, %(source_repo_full_name)s,
+        %(source_repo_owner_id)s)"""
 
         myCursor.execute(insertRepoQuery, reqRepoData)
         cnx.commit()
@@ -256,24 +270,25 @@ def insertUser(dbConfig, userData):
         myCursor = cnx.cursor()  # Cursor Creation
         # keys for fetchting only required keys
 
-        ghAttribs = ['id', 'login', 'name', 'company', 'blog', 'location', 'email', 'hireable',
-                     'public_repos', 'public_gists', 'followers', 'following', 'created_at', 'updated_at']
-
         reqUserData = {}
-
-        for k in userData:
-            if k in ghAttribs:
-                reqUserData[k] = userData[k]
+        reqUserData['id'] = userData['id']
+        reqUserData['login'] = userData['login']
+        reqUserData['name'] = userData['name']
+        reqUserData['company'] = userData['company']
+        reqUserData['blog'] = userData['blog']
+        reqUserData['location'] = userData['location']
+        reqUserData['email'] = userData['email']
+        reqUserData['hireable'] = userData['hireable']
+        reqUserData['public_repos'] = userData['public_repos']
+        reqUserData['public_gists'] = userData['public_gists']
+        reqUserData['followers'] = userData['followers']
+        reqUserData['following'] = userData['following']
+        reqUserData['created_at'] = datetime.datetime.strptime(userData['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+        reqUserData['updated_at'] = datetime.datetime.strptime(userData['updated_at'], "%Y-%m-%dT%H:%M:%SZ")
 
         for k in reqUserData:
             if reqUserData[k] == '':
                 reqUserData[k] = None
-
-        reqUserData['created_at'] = datetime.datetime.strptime(reqUserData['created_at'], "%Y-%m-%dT%H:%M:%SZ")
-        reqUserData['updated_at'] = datetime.datetime.strptime(reqUserData['updated_at'], "%Y-%m-%dT%H:%M:%SZ")
-
-        # for k,v in reqUserData.items():
-        #     print('{}:{}'.format(k,v))
 
         insertUserQuery = """INSERT INTO user (id, login, name, company, blog, location, email, hireable,
             public_repos, public_gists, followers, following, created_at, updated_at)
