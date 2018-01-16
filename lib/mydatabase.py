@@ -8,14 +8,14 @@ import datetime
 
 def insertRepo(dbConfig, repoData):
 
-    userData = myghdata.getUserInfo(repoData['owner']['login'])
+    # userData = myghdata.getUserInfo(repoData['owner']['login'])
 
-    if userData is not None:
-        print("\nWe got User data from GitHub\n")
-        insertUser(dbConfig, userData)
-    else:
-        print("\nGitHub User Info API call returned None\n")
-        sys.exit(1)
+    # if userData is not None:
+    #     print("\nWe got User data from GitHub\n")
+    #     insertUser(dbConfig, userData)
+    # else:
+    #     print("\nGitHub User Info API call returned None\n")
+    #     sys.exit(1)
 
     try:
         cnx = mysql.connector.connect(**dbConfig)  # Connection creation
@@ -82,32 +82,45 @@ def insertRepo(dbConfig, repoData):
     else:
         cnx.close()
 
-    repoCommitsData = myghdata.getRepoCommitsInfo(repoData['full_name'])
+    # repoCommitsData = myghdata.getRepoCommitsInfo(repoData['full_name'])
 
-    if repoCommitsData is not None:
-        print("\nWe got Repository Commits data from GitHub\n")
-        insertRepoCommits(dbConfig, repoCommitsData, repoData['id'])
+    # if repoCommitsData is not None:
+    #     print("\nWe got Repository Commits data from GitHub\n")
+    #     insertRepoCommits(dbConfig, repoCommitsData, repoData['id'])
+    # else:
+    #     print("\nGitHub Repo Commits Info API call returned None\n")
+    #     sys.exit(1)
+
+    # repoContentsData = myghdata.getRepoContentsInfo(repoData['full_name'])
+
+    # if repoContentsData is not None:
+    #     print("\nWe got Repository Contents data from GitHub\n")
+    #     insertRepoContents(dbConfig, repoContentsData, repoData['id'])
+    # else:
+    #     print("\nGitHub Repo Contents Info API call returned None\n")
+    #     sys.exit(1)
+
+    # repoIssuesData = myghdata.getRepoIssuesInfo(repoData['full_name'])
+
+    # if repoIssuesData is not None:
+    #     print("\nWe got Repository Issues data from GitHub\n")
+    #     insertRepoIssues(dbConfig, repoIssuesData, repoData['id'])
+    # else:
+    #     print("\nGitHub Repo Issues Info API call returned None\n")
+    #     sys.exit(1)
+
+    repoLabelsData = myghdata.getRepoLabelsInfo(repoData['full_name'])
+
+    if repoLabelsData is not None:
+        print("\nWe got Repository Labels data from GitHub\n")
+        insertRepoLabels(dbConfig, repoLabelsData, repoData['id'])
     else:
-        print("\nGitHub Repo Commits Info API call returned None\n")
+        print("\nGitHub Repo Labels Info API call returned None\n")
         sys.exit(1)
 
-    repoContentsData = myghdata.getRepoContentsInfo(repoData['full_name'])
 
-    if repoContentsData is not None:
-        print("\nWe got Repository Contents data from GitHub\n")
-        insertRepoContents(dbConfig, repoContentsData, repoData['id'])
-    else:
-        print("\nGitHub Repo Contents Info API call returned None\n")
-        sys.exit(1)
-
-    repoIssuesData = myghdata.getRepoIssuesInfo(repoData['full_name'])
-
-    if repoIssuesData is not None:
-        print("\nWe got Repository Issues data from GitHub\n")
-        insertRepoIssues(dbConfig, repoIssuesData, repoData['id'])
-    else:
-        print("\nGitHub Repo Issues Info API call returned None\n")
-        sys.exit(1)
+def insertRepoLabels(dbConfig, repoLabelsData, repoId):
+    pass
 
 
 def insertRepoIssues(dbConfig, repoIssuesData, repoId):

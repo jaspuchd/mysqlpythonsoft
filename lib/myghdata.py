@@ -9,6 +9,31 @@ headers = {'Content-Type': 'application/json',
            'Accept': 'application/vnd.github.v3+json'}
 
 
+def getRepoLabelsInfo(ghFullRepoName):
+
+    url = '{0}repos/{1}/labels'.format(baseUrl, ghFullRepoName)
+    payload = {'per_page': 100}
+    r = requests.get(url, auth=(username, password), headers=headers, params=payload)
+    if r.status_code == 200:
+        print("\nStatus code is 200 for Repo Labels data\n")
+        repoLabelsData = json.loads(r.text)
+        print("Number of Label Records Fetched: {}".format(len(repoLabelsData)))
+        link = r.headers.get('link', None)
+
+        if link is not None:
+            lastPageNo = int(r.links['last']['url'].split('=')[-1])
+
+            for i in range(2, lastPageNo + 1):
+                nextUrl = r.links['next']['url']
+                r = requests.get(nextUrl, auth=(username, password), headers=headers)
+                repoLabelsData.extend(json.loads(r.text))
+                print("Number of Label Records Fetched: {}".format(len(repoLabelsData)))
+
+        return repoLabelsData
+    else:
+        return None
+
+
 def getRepoCommitsInfo(ghFullRepoName):
 
     url = '{0}repos/{1}/commits'.format(baseUrl, ghFullRepoName)
