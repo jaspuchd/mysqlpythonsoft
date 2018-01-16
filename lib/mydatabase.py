@@ -82,32 +82,32 @@ def insertRepo(dbConfig, repoData):
     else:
         cnx.close()
 
-    # repoCommitsData = myghdata.getRepoCommitsInfo(repoData['full_name'])
+    repoCommitsData = myghdata.getRepoCommitsInfo(repoData['full_name'])
 
-    # if repoCommitsData is not None:
-    #     print("\nWe got Repository Commits data from GitHub\n")
-    #     insertRepoCommits(dbConfig, repoCommitsData, repoData['id'])
-    # else:
-    #     print("\nGitHub Repo Commits Info API call returned None\n")
-    #     sys.exit(1)
+    if repoCommitsData is not None:
+        print("\nWe got Repository Commits data from GitHub\n")
+        insertRepoCommits(dbConfig, repoCommitsData, repoData['id'])
+    else:
+        print("\nGitHub Repo Commits Info API call returned None\n")
+        sys.exit(1)
 
-    # repoContentsData = myghdata.getRepoContentsInfo(repoData['full_name'])
+    repoContentsData = myghdata.getRepoContentsInfo(repoData['full_name'])
 
-    # if repoContentsData is not None:
-    #     print("\nWe got Repository Contents data from GitHub\n")
-    #     insertRepoContents(dbConfig, repoContentsData, repoData['id'])
-    # else:
-    #     print("\nGitHub Repo Contents Info API call returned None\n")
-    #     sys.exit(1)
+    if repoContentsData is not None:
+        print("\nWe got Repository Contents data from GitHub\n")
+        insertRepoContents(dbConfig, repoContentsData, repoData['id'])
+    else:
+        print("\nGitHub Repo Contents Info API call returned None\n")
+        sys.exit(1)
 
-    # repoIssuesData = myghdata.getRepoIssuesInfo(repoData['full_name'])
+    repoIssuesData = myghdata.getRepoIssuesInfo(repoData['full_name'])
 
-    # if repoIssuesData is not None:
-    #     print("\nWe got Repository Issues data from GitHub\n")
-    #     insertRepoIssues(dbConfig, repoIssuesData, repoData['id'])
-    # else:
-    #     print("\nGitHub Repo Issues Info API call returned None\n")
-    #     sys.exit(1)
+    if repoIssuesData is not None:
+        print("\nWe got Repository Issues data from GitHub\n")
+        insertRepoIssues(dbConfig, repoIssuesData, repoData['id'])
+    else:
+        print("\nGitHub Repo Issues Info API call returned None\n")
+        sys.exit(1)
 
 
 def insertRepoIssues(dbConfig, repoIssuesData, repoId):
