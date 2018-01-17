@@ -8,14 +8,14 @@ import datetime
 
 def insertRepo(dbConfig, repoData):
 
-    # userData = myghdata.getUserInfo(repoData['owner']['login'])
+    userData = myghdata.getUserInfo(repoData['owner']['login'])
 
-    # if userData is not None:
-    #     print("\nWe got User data from GitHub\n")
-    #     insertUser(dbConfig, userData)
-    # else:
-    #     print("\nGitHub User Info API call returned None\n")
-    #     sys.exit(1)
+    if userData is not None:
+        print("\nWe got User data from GitHub\n")
+        insertUser(dbConfig, userData)
+    else:
+        print("\nGitHub User Info API call returned None\n")
+        sys.exit(1)
 
     try:
         cnx = mysql.connector.connect(**dbConfig)  # Connection creation
@@ -82,41 +82,41 @@ def insertRepo(dbConfig, repoData):
     else:
         cnx.close()
 
-    # repoCommitsData = myghdata.getRepoCommitsInfo(repoData['full_name'])
+    repoCommitsData = myghdata.getRepoCommitsInfo(repoData['full_name'])
 
-    # if repoCommitsData is not None:
-    #     print("\nWe got Repository Commits data from GitHub\n")
-    #     insertRepoCommits(dbConfig, repoCommitsData, repoData['id'])
-    # else:
-    #     print("\nGitHub Repo Commits Info API call returned None\n")
-    #     sys.exit(1)
+    if repoCommitsData is not None:
+        print("\nWe got Repository Commits data from GitHub\n")
+        insertRepoCommits(dbConfig, repoCommitsData, repoData['id'])
+    else:
+        print("\nGitHub Repo Commits Info API call returned None\n")
+        sys.exit(1)
 
-    # repoContentsData = myghdata.getRepoContentsInfo(repoData['full_name'])
+    repoContentsData = myghdata.getRepoContentsInfo(repoData['full_name'])
 
-    # if repoContentsData is not None:
-    #     print("\nWe got Repository Contents data from GitHub\n")
-    #     insertRepoContents(dbConfig, repoContentsData, repoData['id'])
-    # else:
-    #     print("\nGitHub Repo Contents Info API call returned None\n")
-    #     sys.exit(1)
+    if repoContentsData is not None:
+        print("\nWe got Repository Contents data from GitHub\n")
+        insertRepoContents(dbConfig, repoContentsData, repoData['id'])
+    else:
+        print("\nGitHub Repo Contents Info API call returned None\n")
+        sys.exit(1)
 
-    # repoIssuesData = myghdata.getRepoIssuesInfo(repoData['full_name'])
+    repoIssuesData = myghdata.getRepoIssuesInfo(repoData['full_name'])
 
-    # if repoIssuesData is not None:
-    #     print("\nWe got Repository Issues data from GitHub\n")
-    #     insertRepoIssues(dbConfig, repoIssuesData, repoData['id'])
-    # else:
-    #     print("\nGitHub Repo Issues Info API call returned None\n")
-    #     sys.exit(1)
+    if repoIssuesData is not None:
+        print("\nWe got Repository Issues data from GitHub\n")
+        insertRepoIssues(dbConfig, repoIssuesData, repoData['id'])
+    else:
+        print("\nGitHub Repo Issues Info API call returned None\n")
+        sys.exit(1)
 
-    # repoLabelsData = myghdata.getRepoLabelsInfo(repoData['full_name'])
+    repoLabelsData = myghdata.getRepoLabelsInfo(repoData['full_name'])
 
-    # if repoLabelsData is not None:
-    #     print("\nWe got Repository Labels data from GitHub\n")
-    #     insertRepoLabels(dbConfig, repoLabelsData, repoData['id'])
-    # else:
-    #     print("\nGitHub Repo Labels Info API call returned None\n")
-    #     sys.exit(1)
+    if repoLabelsData is not None:
+        print("\nWe got Repository Labels data from GitHub\n")
+        insertRepoLabels(dbConfig, repoLabelsData, repoData['id'])
+    else:
+        print("\nGitHub Repo Labels Info API call returned None\n")
+        sys.exit(1)
 
     repoMilestonesData = myghdata.getRepoMilestonesInfo(repoData['full_name'])
 
@@ -129,7 +129,64 @@ def insertRepo(dbConfig, repoData):
 
 
 def insertRepoMilestones(dbConfig, repoMilestonesData, repoId):
-    pass
+    try:
+        cnx = mysql.connector.connect(**dbConfig)  # Connection creation
+        print("\nConnection with Database Successful for Repo Milestones Table")
+        myCursor = cnx.cursor()  # Cursor Creation
+
+        reqRepoMilestonesData = []
+
+        for k in range(0, len(repoMilestonesData)):
+            dictForEachMilestoneRecord = {}
+            dictForEachMilestoneRecord['id'] = repoMilestonesData[k]['id']
+            dictForEachMilestoneRecord['number'] = repoMilestonesData[k]['number']
+            dictForEachMilestoneRecord['repo_id'] = repoId
+            dictForEachMilestoneRecord['title'] = repoMilestonesData[k]['title']
+            dictForEachMilestoneRecord['creator_id'] = repoMilestonesData[k]['creator']['id']
+            dictForEachMilestoneRecord['open_issues'] = repoMilestonesData[k]['open_issues']
+            dictForEachMilestoneRecord['closed_issues'] = repoMilestonesData[k]['closed_issues']
+            dictForEachMilestoneRecord['state'] = repoMilestonesData[k]['state']
+            dictForEachMilestoneRecord['created_at'] = datetime.datetime.strptime(repoMilestonesData[k]['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+            dictForEachMilestoneRecord['updated_at'] = datetime.datetime.strptime(repoMilestonesData[k]['updated_at'], "%Y-%m-%dT%H:%M:%SZ")
+            if repoMilestonesData[k]['due_on']:
+                dictForEachMilestoneRecord['due_on'] = datetime.datetime.strptime(repoMilestonesData[k]['due_on'], "%Y-%m-%dT%H:%M:%SZ")
+            else:
+                dictForEachMilestoneRecord['due_on'] = None
+
+            if repoMilestonesData[k]['closed_at']:
+                dictForEachMilestoneRecord['closed_at'] = datetime.datetime.strptime(repoMilestonesData[k]['closed_at'], "%Y-%m-%dT%H:%M:%SZ")
+            else:
+                dictForEachMilestoneRecord['closed_at'] = None
+
+            reqRepoMilestonesData.append(dictForEachMilestoneRecord)
+
+        for k in range(0, len(reqRepoMilestonesData)):
+            for l in reqRepoMilestonesData[k]:
+                if reqRepoMilestonesData[k][l] == '':
+                    reqRepoMilestonesData[k][l] = None
+
+        insertRepoMilestonesQuery = """INSERT INTO milestone (id, number, repo_id, title, creator_id, open_issues, closed_issues, state, created_at, updated_at, due_on, closed_at)
+             VALUES
+             (%(id)s, %(number)s, %(repo_id)s, %(title)s, %(creator_id)s, %(open_issues)s, %(closed_issues)s, %(state)s,
+             %(created_at)s, %(updated_at)s, %(due_on)s, %(closed_at)s)"""
+
+        myCursor.executemany(insertRepoMilestonesQuery, reqRepoMilestonesData)
+        cnx.commit()
+        myCursor.close()
+
+        print("\nData Inserted Successfully in Repo Milestones Table\n")
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Wrong Username of Password for Database Connection")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database {0} doesnt Exist".format(dbConfig['database']))
+        else:
+            print(err)
+            sys.exit(1)  # If data doesnt got inserted in current table, system should
+            # stop here, without automatically inserting data in further tables.
+    else:
+        cnx.close()
 
 
 def insertRepoLabels(dbConfig, repoLabelsData, repoId):
