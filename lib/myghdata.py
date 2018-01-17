@@ -9,6 +9,31 @@ headers = {'Content-Type': 'application/json',
            'Accept': 'application/vnd.github.v3+json'}
 
 
+def getRepoMilestonesInfo(ghFullRepoName):
+
+    url = '{0}repos/{1}/milestones'.format(baseUrl, ghFullRepoName)
+    payload = {'per_page': 100}
+    r = requests.get(url, auth=(username, password), headers=headers, params=payload)
+    if r.status_code == 200:
+        print("\nStatus code is 200 for Repo Milestones data\n")
+        repoMilestonesData = json.loads(r.text)
+        print("Number of Milestone Records Fetched: {}".format(len(repoMilestonesData)))
+        link = r.headers.get('link', None)
+
+        if link is not None:
+            lastPageNo = int(r.links['last']['url'].split('=')[-1])
+
+            for i in range(2, lastPageNo + 1):
+                nextUrl = r.links['next']['url']
+                r = requests.get(nextUrl, auth=(username, password), headers=headers)
+                repoMilestonesData.extend(json.loads(r.text))
+                print("Number of Milestone Records Fetched: {}".format(len(repoMilestonesData)))
+
+        return repoMilestonesData
+    else:
+        return None
+
+
 def getRepoLabelsInfo(ghFullRepoName):
 
     url = '{0}repos/{1}/labels'.format(baseUrl, ghFullRepoName)
