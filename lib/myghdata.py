@@ -3,7 +3,7 @@ import requests
 import re
 
 baseUrl = 'https://api.github.com/'
-username, password = 'jaspu', 'na1244pata'
+username, password = '', ''
 headers = {'Content-Type': 'application/json',
            'User-Agent': 'Python Student',
            'Accept': 'application/vnd.github.v3+json'}
