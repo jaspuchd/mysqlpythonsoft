@@ -10,10 +10,10 @@ def main():
     # password = input('Github Password: ')
 
     url = urljoin(GITHUB_API, 'authorizations')
-    # payload = {"client_secret": "a46f6528b06d4d26701491ac95ca1c86a4164bfd",
+    # payload = {"client_secret": "",
     # "scopes": ["public_repo"], "note": "admin script", }
 
-    r = requests.get(url, auth=('jaspu', 'na1244pata'))
+    r = requests.get(url, auth=('', ''))
     print(r.text)
     j = json.loads(r.text)
 
